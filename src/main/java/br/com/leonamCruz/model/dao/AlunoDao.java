@@ -1,11 +1,14 @@
 package br.com.leonamCruz.model.dao;
 
 import br.com.leonamCruz.control.serviceEntidade.ServiceAluno;
+import br.com.leonamCruz.util.UtilData;
 import br.com.leonamCruz.util.excessao.ExcessaoAlunoRepetidoBancoDeDados;
 
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AlunoDao implements GenericDao {
     ServiceAluno serviceAluno;
@@ -16,6 +19,9 @@ public class AlunoDao implements GenericDao {
 
     public AlunoDao(ServiceAluno serviceAluno) {
         this.serviceAluno = serviceAluno;
+    }
+
+    public AlunoDao() {
     }
 
     @Override
@@ -52,7 +58,7 @@ public class AlunoDao implements GenericDao {
 
     @Override
     public void excluir() throws SQLException {
-        verificaSeIdExiste();
+        verificaSeIdExiste(serviceAluno.getId());
 
         try (var conexao = Conexao.getConexao(); var stmt = conexao.prepareStatement(EXCLUIR_ALUNO)) {
             stmt.setInt(1, serviceAluno.getId());
@@ -65,13 +71,41 @@ public class AlunoDao implements GenericDao {
 
     }
 
-    private void verificaSeIdExiste() throws SQLException {
+    private void verificaSeIdExiste(int id) throws SQLException {
         try (var conexao = Conexao.getConexao(); var stmt = conexao.prepareStatement(ACHA_ID)) {
-            stmt.setInt(1, serviceAluno.getId());
+            stmt.setInt(1, id);
             var resultSet = stmt.executeQuery();
-            if (!resultSet.isBeforeFirst()){
+            if (!resultSet.isBeforeFirst()) {
                 throw new SQLException("Não existe essa ID.");
             }
         }
+    }
+
+    public List<ServiceAluno> pesquisarPorId(int id) throws SQLException {
+        verificaSeIdExiste(id);
+
+        try (var conexao = Conexao.getConexao(); var stmt = conexao.prepareStatement(ACHA_ID)) {
+            stmt.setInt(1, id);
+            var resultSet = stmt.executeQuery();
+            var lista = new ArrayList<ServiceAluno>();
+            if (resultSet.next()) {
+                var aluno = new ServiceAluno();
+                aluno.setId(resultSet.getInt("id"));
+                aluno.setNome(resultSet.getString("nome"));
+
+                var dataBr = UtilData.padraoBrasileiroDeData(resultSet.getString("nascimento"));
+                int dia = UtilData.pegaDia(dataBr);
+                int mes = UtilData.pegaDia(dataBr);
+                int ano = UtilData.pegaAno(dataBr);
+                int idade = UtilData.calculaIdade(dia, mes, ano);
+
+                aluno.setNascimento(dataBr);
+                aluno.setIdade(idade);
+                aluno.setSerie(resultSet.getInt("serie"));
+                lista.add(aluno);
+                return lista;
+            }
+        }
+        return null;
     }
 }

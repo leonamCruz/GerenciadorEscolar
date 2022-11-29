@@ -7,8 +7,11 @@ import br.com.leonamCruz.util.UtilNome;
 import br.com.leonamCruz.util.excessao.ExceptionUtilData;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.event.*;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CrudViewAluno {
     private JTabbedPane menu;
@@ -28,7 +31,7 @@ public class CrudViewAluno {
     private JButton botaoPesquisaPorId;
     private JTextField txtPesquisaPorNome;
     private JButton botaoPesquisaPorNome;
-    private JTable nomeCompletoTable;
+    private JTable tabela;
 
     private JPanel getRoot() {
         return root;
@@ -116,8 +119,45 @@ public class CrudViewAluno {
                 JOptionPane.showMessageDialog(null,ex.getMessage(),"Fail",JOptionPane.ERROR_MESSAGE);
             }
         });
+        botaoPesquisaPorId.addActionListener(e -> listar(Integer.parseInt(txtIdPesquisa.getText())));
     }
 
+    private void listar(int id) {
+        try {
+            var alunoEncontrado = new ServiceAlunoDao().pesquisarPorId(id);
+
+            DefaultTableModel defaultTableModel = (DefaultTableModel)tabela.getModel();
+            defaultTableModel.setRowCount(0);
+
+            for(ServiceAluno serviceAluno : alunoEncontrado){
+                defaultTableModel.addRow(new Object[]{
+                        serviceAluno.getId(),
+                        serviceAluno.getNome(),
+                        serviceAluno.getNascimento(),
+                        serviceAluno.getIdade(),
+                        serviceAluno.getSerie()
+                });
+                menuPesquisa.setSelectedIndex(2);
+
+
+            }
+
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null,ex.getMessage(),"Erro", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    public void createTable(){
+        Object[][] data = {
+                {}
+        };
+        tabela.setModel(new DefaultTableModel(data,new String[]{
+                "Id",
+                "Nome",
+                "Nascimento",
+                "Idade",
+                "Série"
+        }));
+    }
     private void cadastrar() {
         if (checkBox1.isSelected() && checkBox2.isSelected()) {
             try {
@@ -192,5 +232,6 @@ public class CrudViewAluno {
         frame.setSize(800, 200);
         frame.setVisible(true);
         frame.requestFocus();
+        crudView.createTable();
     }
 }

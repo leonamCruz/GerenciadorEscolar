@@ -60,4 +60,30 @@ public class UtilData {
         }
         return true;
     }
+
+    public static String padraoBrasileiroDeData(String date) {
+        // AAAA-MM-DD Internacional - Entra
+        //DD-MM-AAAA Nacional - Sai
+        char[] numerosSeparados = date.toCharArray();
+        String dia, mes, ano;
+
+        dia = String.valueOf(numerosSeparados[8]) + numerosSeparados[9];
+        mes = String.valueOf(numerosSeparados[5]) + numerosSeparados[6];
+        ano = String.valueOf(numerosSeparados[0]) + numerosSeparados[1] + numerosSeparados[2] + numerosSeparados[3];
+
+        return dia + "-" + mes + "-" + ano;
+    }
+
+    public static int pegaDia(String dataBr) {
+        String dia = String.valueOf(dataBr.charAt(0)) + dataBr.charAt(1);
+        return Integer.parseInt(dia);
+    }
+    public static int pegaMes(String dataBr) {
+        String mes = String.valueOf(dataBr.charAt(3)) + dataBr.charAt(4);
+        return Integer.parseInt(mes);
+    }
+    public static int pegaAno(String dataBr) {
+        String ano = String.valueOf(dataBr.charAt(6)) + dataBr.charAt(7) + dataBr.charAt(8) + dataBr.charAt(9);
+        return Integer.parseInt(ano);
+    }
 }

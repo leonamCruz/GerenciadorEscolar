@@ -7,4 +7,6 @@ public class ServiceAlunoDao extends AlunoDao {
     public ServiceAlunoDao(ServiceAluno serviceAluno) {
         super(serviceAluno);
     }
+    public ServiceAlunoDao() {
+    }
 }
