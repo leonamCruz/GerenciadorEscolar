@@ -1,4 +1,4 @@
-package br.com.leonamCruz.view;
+package br.com.leonamCruz.util.excessao;
 
 public class ExceptionUtilData extends Exception{
     public ExceptionUtilData(String message) {

@@ -3,8 +3,17 @@ package br.com.leonamCruz.model.entidade;
 public abstract class Aluno {
     private int id;
     private String nome;
-    private byte idade;
-    private byte serie;
+    private int idade;
+    private String nascimento; //AAAA-MM -DD
+    private int serie;
+
+    public void setNascimento(String nascimento) {
+        this.nascimento = nascimento;
+    }
+
+    public String getNascimento() {
+        return nascimento;
+    }
 
     public int getId() {
         return id;
@@ -22,19 +31,19 @@ public abstract class Aluno {
         this.nome = nome;
     }
 
-    public byte getIdade() {
+    public int getIdade() {
         return idade;
     }
 
-    public void setIdade(byte idade) {
+    public void setIdade(int idade) {
         this.idade = idade;
     }
 
-    public byte getSerie() {
+    public int getSerie() {
         return serie;
     }
 
-    public void setSerie(byte serie) {
+    public void setSerie(int serie) {
         this.serie = serie;
     }
 }

@@ -1,9 +1,24 @@
-package br.com.leonamCruz.view;
+package br.com.leonamCruz.util;
+
+import br.com.leonamCruz.util.excessao.ExceptionUtilData;
 
 import java.time.Year;
 import java.util.Calendar;
 
 public class UtilData {
+    public static int calculaIdade(int dia, int mes, int ano) {
+        int anoAtual = Calendar.getInstance().get(Calendar.YEAR);
+        int mesAtual = Calendar.getInstance().get(Calendar.MONTH) + 1;
+        int diaAtual = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
+        int idade;
+
+        idade = anoAtual - ano;
+
+        if(mesAtual <= mes &&  diaAtual != dia){
+            idade--;
+        }
+        return idade;
+    }
     public static boolean verificaSeDiaEhValido(int dia, int mes, int ano) throws ExceptionUtilData {
         if (dia > Calendar.getInstance().get(Calendar.DAY_OF_MONTH) && mes > Calendar.getInstance().get(Calendar.MONTH) && ano > Calendar.getInstance().get(Calendar.YEAR)) {
             throw new ExceptionUtilData("Ainda não chegamos nessa data");

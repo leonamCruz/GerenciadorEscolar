@@ -1,7 +1,14 @@
 package br.com.leonamCruz.view;
 
+import br.com.leonamCruz.control.serviceDao.ServiceAlunoDao;
+import br.com.leonamCruz.control.serviceEntidade.ServiceAluno;
+import br.com.leonamCruz.util.UtilData;
+import br.com.leonamCruz.util.UtilNome;
+import br.com.leonamCruz.util.excessao.ExceptionUtilData;
+
 import javax.swing.*;
 import java.awt.event.*;
+import java.sql.SQLException;
 
 public class CrudViewAluno {
     private JTabbedPane menu;
@@ -102,15 +109,31 @@ public class CrudViewAluno {
     }
 
     private void cadastrar() {
-        if(checkBox1.isSelected() && checkBox2.isSelected()){
+        if (checkBox1.isSelected() && checkBox2.isSelected()) {
             try {
+                var serviceAluno = new ServiceAluno();
+                int dia, mes, ano;
 
-                JOptionPane.showMessageDialog(null,"Cadastrado com Sucesso","Sucesso",JOptionPane.DEFAULT_OPTION);
-            } catch (Exception e){
-                JOptionPane.showMessageDialog(null,"Sem Sucesso: + " + e.getMessage(),"Fail",JOptionPane.ERROR_MESSAGE);
+                dia = Integer.parseInt(txtDia.getText());
+                mes = Integer.parseInt(txtMes.getText());
+                ano = Integer.parseInt(txtAno.getText());
+
+                String nascimento = String.valueOf(ano) + "-" + String.valueOf(mes) + "-" + String.valueOf(dia);
+
+                serviceAluno.setNome(txtNome.getText());
+                serviceAluno.setNascimento(nascimento);
+                serviceAluno.setIdade(UtilData.calculaIdade(dia, mes, ano));
+                serviceAluno.setSerie(opcSerie.getSelectedIndex());
+
+                new ServiceAlunoDao(serviceAluno).salvar();
+
+
+                JOptionPane.showMessageDialog(null, "Cadastrado com Sucesso", "Sucesso", JOptionPane.DEFAULT_OPTION);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, "Sem Sucesso: + " + e.getMessage(), "Fail", JOptionPane.ERROR_MESSAGE);
             }
         } else {
-            JOptionPane.showMessageDialog(null,"Algum Campo está errado...","Fail",JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Algum Campo está errado...", "Fail", JOptionPane.WARNING_MESSAGE);
         }
 
     }
@@ -138,7 +161,6 @@ public class CrudViewAluno {
             checkBox2.setSelected(false);
             System.out.println(exception.getMessage());
         }
-
     }
 
     private void verificaNome() {

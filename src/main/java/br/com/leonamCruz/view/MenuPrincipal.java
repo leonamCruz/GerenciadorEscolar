@@ -1,5 +1,7 @@
 package br.com.leonamCruz.view;
 
+import br.com.leonamCruz.util.UtilMenu;
+
 import javax.swing.*;
 import java.awt.event.*;
 import java.util.Date;
