@@ -14,11 +14,12 @@ public class UtilData {
 
         idade = anoAtual - ano;
 
-        if(mesAtual <= mes &&  diaAtual != dia){
+        if (mesAtual <= mes && diaAtual != dia) {
             idade--;
         }
         return idade;
     }
+
     public static boolean verificaSeDiaEhValido(int dia, int mes, int ano) throws ExceptionUtilData {
         if (dia > Calendar.getInstance().get(Calendar.DAY_OF_MONTH) && mes > Calendar.getInstance().get(Calendar.MONTH) && ano > Calendar.getInstance().get(Calendar.YEAR)) {
             throw new ExceptionUtilData("Ainda não chegamos nessa data");
@@ -49,9 +50,11 @@ public class UtilData {
 
     public static boolean verificaAnoValido(int ano) throws ExceptionUtilData {
         int anoAtual = Calendar.getInstance().get(Calendar.YEAR);
+
         if (anoAtual - 120 >= ano) {
             throw new ExceptionUtilData("Acredito que você deveria estar morto... Ou então é o novo recordista mundial.");
         }
+
         if (ano > anoAtual) {
             throw new ExceptionUtilData("Acredito que você não tenha nascido no futuro...");
         }

@@ -106,6 +106,16 @@ public class CrudViewAluno {
         botaoCadastrar.addActionListener(e -> {
             cadastrar();
         });
+        excluirButton.addActionListener(e -> {
+            var serviceAluno = new ServiceAluno();
+            serviceAluno.setId(Integer.parseInt(txtIdExcluir.getText()));
+            try {
+                new ServiceAlunoDao(serviceAluno).excluir();
+                JOptionPane.showMessageDialog(null,"Excluido com sucesso","Sucesso",JOptionPane.DEFAULT_OPTION);
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(null,ex.getMessage(),"Fail",JOptionPane.ERROR_MESSAGE);
+            }
+        });
     }
 
     private void cadastrar() {
@@ -135,7 +145,6 @@ public class CrudViewAluno {
         } else {
             JOptionPane.showMessageDialog(null, "Algum Campo está errado...", "Fail", JOptionPane.WARNING_MESSAGE);
         }
-
     }
 
     private void verificaData() {
