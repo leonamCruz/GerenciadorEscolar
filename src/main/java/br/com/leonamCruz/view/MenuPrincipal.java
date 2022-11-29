@@ -1,10 +1,7 @@
 package br.com.leonamCruz.view;
 
 import javax.swing.*;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
+import java.awt.event.*;
 import java.util.Date;
 
 public class MenuPrincipal {
@@ -24,6 +21,9 @@ public class MenuPrincipal {
                 super.componentResized(e);
                 saudacoes.setText(new UtilMenu().saudacoes(new Date()));
             }
+        });
+        botaoVamosLa.addActionListener(e -> {
+            CrudViewAluno.runCrudView((short) opcAlunos.getSelectedIndex());
         });
     }
 
