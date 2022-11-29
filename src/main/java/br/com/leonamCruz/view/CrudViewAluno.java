@@ -17,8 +17,8 @@ public class CrudViewAluno {
     private JButton excluirButton;
     private JTabbedPane tabbedPane2;
     private JTextField txtIdPesquisa;
-    private JButton pesquisarButton;
-    private JTextField textField1;
-    private JButton pesquisarButton1;
+    private JButton botaoPesquisaPorId;
+    private JTextField txtPesquisaPorNome;
+    private JButton botaoPesquisaPorNome;
     private JTable nomeCompletoTable;
 }
