@@ -22,9 +22,7 @@ public class MenuPrincipal {
                 saudacoes.setText(new UtilMenu().saudacoes(new Date()));
             }
         });
-        botaoVamosLa.addActionListener(e -> {
-            CrudViewAluno.runCrudView((short) opcAlunos.getSelectedIndex());
-        });
+        botaoVamosLa.addActionListener(e -> CrudViewAluno.runCrudView((short) opcAlunos.getSelectedIndex()));
     }
 
     public JPanel getRoot() {
