@@ -1,4 +1,4 @@
 package br.com.leonamCruz.model.entidade;
 
-public class NotaAluno {
+public abstract class NotaAluno {
 }

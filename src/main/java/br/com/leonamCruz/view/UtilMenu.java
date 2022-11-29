@@ -1,14 +1,11 @@
 package br.com.leonamCruz.view;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Date;
 
 public class UtilMenu {
-
-    public boolean verificaOpcao(short opcaoMaior, short opcaoMenor, short entradaUser){
-        return entradaUser <= opcaoMaior && entradaUser >= opcaoMenor;
-    }
-
-    public String saudacoes(Date date){
+    public String saudacoes(@NotNull Date date){
         int horas = date.getHours();
         if(horas >= 0 && horas < 6){
             return "Boa Madrugada... Mas, você deveria está dormindo.";

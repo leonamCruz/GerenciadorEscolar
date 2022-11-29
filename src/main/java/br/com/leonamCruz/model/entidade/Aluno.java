@@ -1,6 +1,6 @@
 package br.com.leonamCruz.model.entidade;
 
-public class Aluno {
+public abstract class Aluno {
     private int id;
     private String nome;
     private byte idade;
