@@ -33,6 +33,15 @@ public class CrudViewAluno {
     private JTable tabela;
     private JButton mostrarTodosAlunosButton;
     private JButton limparPesquisaButton;
+    private JTextField textNomeAlterar;
+    private JTextField txtDiaAlterar;
+    private JTextField txtMesAlterar;
+    private JTextField txtAnoAlterar;
+    private JComboBox opcSerieAlterar;
+    private JTextField txtIdAlterar;
+    private JButton cadastrarAlterar;
+    private JCheckBox checkBox3;
+    private JCheckBox checkBox4;
 
     private JPanel getRoot() {
         return root;
@@ -145,13 +154,16 @@ public class CrudViewAluno {
     }
 
     private void listarPorNome(String nome) {
-        try {
-            listar(new ServiceAlunoDao().pesquisarPorNome(nome + "%"));
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Fail " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+        if (txtPesquisaPorNome.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Caixa de texto vazia", "Erro", JOptionPane.WARNING_MESSAGE);
+        } else {
+            try {
+                listar(new ServiceAlunoDao().pesquisarPorNome(nome + "%"));
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(null, "Fail " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+            }
         }
     }
-
     private void listar(List<ServiceAluno> lista) {
         var defaultTableModel = (DefaultTableModel) tabela.getModel();
         defaultTableModel.setRowCount(0);
@@ -173,13 +185,13 @@ public class CrudViewAluno {
             menuPesquisa.setSelectedIndex(2);
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+        } catch (NumberFormatException ex){
+            JOptionPane.showMessageDialog(null,"Você digitou algo que não é número","Falha",JOptionPane.WARNING_MESSAGE);
         }
     }
 
     public void createTable() {
-        Object[][] data = {
-                {}
-        };
+        Object[][] data = {{}};
         tabela.setModel(new DefaultTableModel(data, new String[]{
                 "Id",
                 "Nome",
@@ -207,7 +219,6 @@ public class CrudViewAluno {
                 serviceAluno.setSerie(opcSerie.getSelectedIndex() + 6);
 
                 new ServiceAlunoDao(serviceAluno).salvar();
-
 
                 JOptionPane.showMessageDialog(null, "Cadastrado com Sucesso", "Sucesso", JOptionPane.DEFAULT_OPTION);
             } catch (Exception e) {
@@ -239,7 +250,6 @@ public class CrudViewAluno {
             JOptionPane.showMessageDialog(null, exceptionUtilData.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
         } catch (Exception exception) {
             checkBox2.setSelected(false);
-            System.out.println(exception.getMessage());
         }
     }
 
