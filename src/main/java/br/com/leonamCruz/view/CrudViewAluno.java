@@ -10,7 +10,6 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.*;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class CrudViewAluno {
@@ -32,6 +31,8 @@ public class CrudViewAluno {
     private JTextField txtPesquisaPorNome;
     private JButton botaoPesquisaPorNome;
     private JTable tabela;
+    private JButton mostrarTodosAlunosButton;
+    private JButton limparPesquisaButton;
 
     private JPanel getRoot() {
         return root;
@@ -106,51 +107,75 @@ public class CrudViewAluno {
                 }
             }
         });
-        botaoCadastrar.addActionListener(e -> {
-            cadastrar();
-        });
-        excluirButton.addActionListener(e -> {
-            var serviceAluno = new ServiceAluno();
-            serviceAluno.setId(Integer.parseInt(txtIdExcluir.getText()));
-            try {
-                new ServiceAlunoDao(serviceAluno).excluir();
-                JOptionPane.showMessageDialog(null,"Excluido com sucesso","Sucesso",JOptionPane.DEFAULT_OPTION);
-            } catch (SQLException ex) {
-                JOptionPane.showMessageDialog(null,ex.getMessage(),"Fail",JOptionPane.ERROR_MESSAGE);
-            }
-        });
-        botaoPesquisaPorId.addActionListener(e -> listar(Integer.parseInt(txtIdPesquisa.getText())));
+        botaoCadastrar.addActionListener(e -> cadastrar());
+        excluirButton.addActionListener(e -> excluir());
+        botaoPesquisaPorId.addActionListener(e -> listarPorId(Integer.parseInt(txtIdPesquisa.getText())));
+        botaoPesquisaPorNome.addActionListener(e -> listarPorNome(txtPesquisaPorNome.getText()));
+        limparPesquisaButton.addActionListener(e -> limparPesquisa());
+        mostrarTodosAlunosButton.addActionListener(e -> mostrarTodos());
     }
 
-    private void listar(int id) {
+    private void mostrarTodos() {
         try {
-            var alunoEncontrado = new ServiceAlunoDao().pesquisarPorId(id);
-
-            DefaultTableModel defaultTableModel = (DefaultTableModel)tabela.getModel();
-            defaultTableModel.setRowCount(0);
-
-            for(ServiceAluno serviceAluno : alunoEncontrado){
-                defaultTableModel.addRow(new Object[]{
-                        serviceAluno.getId(),
-                        serviceAluno.getNome(),
-                        serviceAluno.getNascimento(),
-                        serviceAluno.getIdade(),
-                        serviceAluno.getSerie()
-                });
-                menuPesquisa.setSelectedIndex(2);
-
-
-            }
-
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null,ex.getMessage(),"Erro", JOptionPane.ERROR_MESSAGE);
+            listar(new ServiceAlunoDao().pegaTodoMundo());
+        } catch (SQLException e){
+            JOptionPane.showMessageDialog(null,"Não conseguir efetuar a pesquisa: " + e.getMessage(), "Erro",JOptionPane.ERROR_MESSAGE);
         }
     }
-    public void createTable(){
+
+    private void excluir() {
+        var serviceAluno = new ServiceAluno();
+        serviceAluno.setId(Integer.parseInt(txtIdExcluir.getText()));
+        try {
+            new ServiceAlunoDao(serviceAluno).excluir();
+            JOptionPane.showMessageDialog(null, "Excluido com sucesso", "Sucesso", JOptionPane.DEFAULT_OPTION);
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, ex.getMessage(), "Fail", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void limparPesquisa() {
+        var defaultTableModel = (DefaultTableModel) tabela.getModel();
+        defaultTableModel.setRowCount(0);
+    }
+
+    private void listarPorNome(String nome) {
+        try {
+            listar(new ServiceAlunoDao().pesquisarPorNome(nome + "%"));
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Fail " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void listar(List<ServiceAluno> lista) {
+        var defaultTableModel = (DefaultTableModel) tabela.getModel();
+        defaultTableModel.setRowCount(0);
+        for (ServiceAluno serviceAluno : lista) {
+            defaultTableModel.addRow(new Object[]{
+                    serviceAluno.getId(),
+                    serviceAluno.getNome(),
+                    serviceAluno.getNascimento(),
+                    serviceAluno.getIdade(),
+                    serviceAluno.getSerie()
+            });
+            menuPesquisa.setSelectedIndex(2);
+        }
+    }
+
+    private void listarPorId(int id) {
+        try {
+            listar(new ServiceAlunoDao().pesquisarPorId(id));
+            menuPesquisa.setSelectedIndex(2);
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    public void createTable() {
         Object[][] data = {
                 {}
         };
-        tabela.setModel(new DefaultTableModel(data,new String[]{
+        tabela.setModel(new DefaultTableModel(data, new String[]{
                 "Id",
                 "Nome",
                 "Nascimento",
@@ -158,6 +183,7 @@ public class CrudViewAluno {
                 "Série"
         }));
     }
+
     private void cadastrar() {
         if (checkBox1.isSelected() && checkBox2.isSelected()) {
             try {
@@ -168,12 +194,12 @@ public class CrudViewAluno {
                 mes = Integer.parseInt(txtMes.getText());
                 ano = Integer.parseInt(txtAno.getText());
 
-                String nascimento = String.valueOf(ano) + "-" + String.valueOf(mes) + "-" + String.valueOf(dia);
+                String nascimento = ano + "-" + mes + "-" + dia;
 
                 serviceAluno.setNome(txtNome.getText());
                 serviceAluno.setNascimento(nascimento);
                 serviceAluno.setIdade(UtilData.calculaIdade(dia, mes, ano));
-                serviceAluno.setSerie(opcSerie.getSelectedIndex());
+                serviceAluno.setSerie(opcSerie.getSelectedIndex() + 6);
 
                 new ServiceAlunoDao(serviceAluno).salvar();
 
