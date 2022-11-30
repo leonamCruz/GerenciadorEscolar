@@ -125,12 +125,17 @@ public class CrudViewAluno {
 
     private void excluir() {
         var serviceAluno = new ServiceAluno();
-        serviceAluno.setId(Integer.parseInt(txtIdExcluir.getText()));
+        if(txtIdExcluir.getText().isEmpty()){
+            JOptionPane.showMessageDialog(null,"O campo está vazio");
+        }
         try {
+            serviceAluno.setId(Integer.parseInt(txtIdExcluir.getText()));
             new ServiceAlunoDao(serviceAluno).excluir();
             JOptionPane.showMessageDialog(null, "Excluido com sucesso", "Sucesso", JOptionPane.DEFAULT_OPTION);
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, ex.getMessage(), "Fail", JOptionPane.ERROR_MESSAGE);
+        } catch (NumberFormatException exception){
+            JOptionPane.showMessageDialog(null,"Você colocou algo que não é número","Erro",JOptionPane.ERROR_MESSAGE);
         }
     }
 
