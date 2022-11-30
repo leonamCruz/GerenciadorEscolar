@@ -1,5 +1,14 @@
 # GerenciadorEscolar
-  Olá, eu me chamo Leonam. Meu gerenciador escolar atualmente está apenas cadastrando alunos nessa versão 1.1.
+  
+  Versão Atual - 1.4
+  Atualizações :
+  Verificações mais eficientes.
+  Pesquisa por id, nome e total implementadas.
+  Excluir por id em funcionamento.
+  Remoção de bug's ao cadastrar.
+	Maior estabilidade do sistema.
+	Aumento da velocidade de pesquisa.
+                 
 
 # Detalhes Técnicos
   O projeto está na Arquitetura MVC(Model-View-Control); Atualmente estou usando uma tecnologia defasada para a view que é a Swing.
