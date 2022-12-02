@@ -5,5 +5,5 @@ import java.sql.SQLException;
 public interface GenericDao {
     void salvar() throws SQLException;
     void alterar()throws SQLException;
-    void excluir()throws SQLException;
+    void excluir(int id)throws SQLException;
 }

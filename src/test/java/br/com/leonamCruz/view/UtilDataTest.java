@@ -1,7 +1,7 @@
 package br.com.leonamCruz.view;
 
-import br.com.leonamCruz.util.UtilData;
-import br.com.leonamCruz.util.excessao.ExceptionUtilData;
+import br.com.leonamCruz.control.util.UtilData;
+import br.com.leonamCruz.control.excessao.ExceptionUtilData;
 import org.junit.Assert;
 import org.junit.Test;
 

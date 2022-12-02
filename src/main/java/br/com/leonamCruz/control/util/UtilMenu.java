@@ -1,4 +1,4 @@
-package br.com.leonamCruz.util;
+package br.com.leonamCruz.control.util;
 
 import org.jetbrains.annotations.NotNull;
 

@@ -2,9 +2,9 @@ package br.com.leonamCruz.view;
 
 import br.com.leonamCruz.control.serviceDao.ServiceAlunoDao;
 import br.com.leonamCruz.control.serviceEntidade.ServiceAluno;
-import br.com.leonamCruz.util.UtilData;
-import br.com.leonamCruz.util.UtilNome;
-import br.com.leonamCruz.util.excessao.ExceptionUtilData;
+import br.com.leonamCruz.control.util.UtilData;
+import br.com.leonamCruz.control.util.UtilNome;
+import br.com.leonamCruz.control.excessao.ExceptionUtilData;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -15,7 +15,7 @@ import java.util.List;
 public class CrudViewAluno {
     private JTabbedPane menu;
     private JPanel root;
-    private JTextField txtNome;
+    private JTextField txtNomeCadastrar;
     private JTextField txtDia;
     private JTextField txtMes;
     private JTextField txtAno;
@@ -39,8 +39,8 @@ public class CrudViewAluno {
     private JTextField txtAnoAlterar;
     private JComboBox opcSerieAlterar;
     private JTextField txtIdAlterar;
-    private JButton cadastrarAlterar;
-    private JCheckBox checkBox3;
+    private JButton botaoAlterar;
+    private JCheckBox checkbox3;
     private JCheckBox checkBox4;
 
     private JPanel getRoot() {
@@ -50,20 +50,20 @@ public class CrudViewAluno {
     public CrudViewAluno(short aba) {
 
         menu.setSelectedIndex(aba);
-        txtNome.addKeyListener(new KeyAdapter() {
+        txtNomeCadastrar.addKeyListener(new KeyAdapter() {
             @Override
             public void keyTyped(KeyEvent e) {
                 super.keyTyped(e);
                 verificaNome();
             }
         });
-        txtNome.addFocusListener(new FocusAdapter() {
+        txtNomeCadastrar.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
                 super.focusLost(e);
                 verificaNome();
-                if (!txtNome.getText().isEmpty()) {
-                    txtNome.setText(UtilNome.normalizaNome(txtNome.getText()));
+                if (!txtNomeCadastrar.getText().isEmpty()) {
+                    txtNomeCadastrar.setText(UtilNome.normalizaNome(txtNomeCadastrar.getText()));
                 }
             }
         });
@@ -122,29 +122,127 @@ public class CrudViewAluno {
         botaoPesquisaPorNome.addActionListener(e -> listarPorNome(txtPesquisaPorNome.getText()));
         limparPesquisaButton.addActionListener(e -> limparPesquisa());
         mostrarTodosAlunosButton.addActionListener(e -> mostrarTodos());
+        tabela.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                
+            }
+        });
+        tabela.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                pegaDados(tabela.getSelectedRow());
+            }
+        });
+        txtDiaAlterar.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                super.focusLost(e);
+                verificaDataAlterar();
+            }
+        });
+        txtMesAlterar.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                super.focusLost(e);
+                verificaDataAlterar();
+            }
+        });
+        txtAnoAlterar.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                super.focusLost(e);
+                verificaDataAlterar();
+            }
+        });
+        textNomeAlterar.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                super.focusLost(e);
+                verificaNomeAlterar();
+            }
+        });
+        textNomeAlterar.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                super.keyTyped(e);
+                verificaNomeAlterar();
+            }
+        });
+        botaoAlterar.addActionListener(e -> alterar());
+    }
+
+    private void alterar() {
+        if (checkbox3.isSelected() && checkBox4.isSelected()) {
+            try {
+                var serviceAluno = new ServiceAluno();
+                int dia, mes, ano;
+
+                dia = Integer.parseInt(txtDiaAlterar.getText());
+                mes = Integer.parseInt(txtMesAlterar.getText());
+                ano = Integer.parseInt(txtAnoAlterar.getText());
+
+                String nascimento = ano + "-" + mes + "-" + dia;
+
+                serviceAluno.setId(Integer.parseInt(txtIdAlterar.getText()));
+                serviceAluno.setNome(textNomeAlterar.getText());
+                serviceAluno.setNascimento(nascimento);
+                serviceAluno.setIdade(UtilData.calculaIdade(dia, mes, ano));
+                serviceAluno.setSerie(opcSerieAlterar.getSelectedIndex() + 6);
+
+                new ServiceAlunoDao(serviceAluno).alterar();
+
+                JOptionPane.showMessageDialog(null, "Alterado com Sucesso", "Sucesso", JOptionPane.DEFAULT_OPTION);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, "Sem Sucesso:  " + e.getMessage(), "Fail", JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Algum Campo está errado...", "Fail", JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
+    private void pegaDados(int linha) {
+        menu.setSelectedIndex(1);
+        txtIdAlterar.setText(String.valueOf(tabela.getValueAt(linha,0)));
+        textNomeAlterar.setText(String.valueOf(tabela.getValueAt(linha,1)));
+
+        String padraoDataEmBr = String.valueOf(tabela.getValueAt(linha,2));
+        int dia = UtilData.pegaDia(padraoDataEmBr);
+        int mes = UtilData.pegaMes(padraoDataEmBr);
+        int ano = UtilData.pegaAno(padraoDataEmBr);
+
+        txtDiaAlterar.setText(String.valueOf(dia));
+        txtMesAlterar.setText(String.valueOf(mes));
+        txtAnoAlterar.setText(String.valueOf(ano));
+
+        opcSerieAlterar.setSelectedIndex((Integer) tabela.getValueAt(linha,4) - 6);
+        verificaNomeAlterar();
+        verificaDataAlterar();
+
     }
 
     private void mostrarTodos() {
         try {
             listar(new ServiceAlunoDao().pegaTodoMundo());
-        } catch (SQLException e){
-            JOptionPane.showMessageDialog(null,"Não conseguir efetuar a pesquisa: " + e.getMessage(), "Erro",JOptionPane.ERROR_MESSAGE);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Não conseguir efetuar a pesquisa: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     private void excluir() {
-        var serviceAluno = new ServiceAluno();
-        if(txtIdExcluir.getText().isEmpty()){
-            JOptionPane.showMessageDialog(null,"O campo está vazio");
-        }
-        try {
-            serviceAluno.setId(Integer.parseInt(txtIdExcluir.getText()));
-            new ServiceAlunoDao(serviceAluno).excluir();
-            JOptionPane.showMessageDialog(null, "Excluido com sucesso", "Sucesso", JOptionPane.DEFAULT_OPTION);
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, ex.getMessage(), "Fail", JOptionPane.ERROR_MESSAGE);
-        } catch (NumberFormatException exception){
-            JOptionPane.showMessageDialog(null,"Você colocou algo que não é número","Erro",JOptionPane.ERROR_MESSAGE);
+        if (txtIdExcluir.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "O campo está vazio");
+        } else {
+            try {
+                new ServiceAlunoDao().excluir(Integer.parseInt(txtIdExcluir.getText()));
+                JOptionPane.showMessageDialog(null, "Excluido com sucesso", "Sucesso", JOptionPane.DEFAULT_OPTION);
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(null, ex.getMessage(), "Fail", JOptionPane.ERROR_MESSAGE);
+            } catch (NumberFormatException exception) {
+                JOptionPane.showMessageDialog(null, "Você colocou algo que não é número", "Erro", JOptionPane.ERROR_MESSAGE);
+            }
         }
     }
 
@@ -164,6 +262,7 @@ public class CrudViewAluno {
             }
         }
     }
+
     private void listar(List<ServiceAluno> lista) {
         var defaultTableModel = (DefaultTableModel) tabela.getModel();
         defaultTableModel.setRowCount(0);
@@ -185,8 +284,8 @@ public class CrudViewAluno {
             menuPesquisa.setSelectedIndex(2);
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
-        } catch (NumberFormatException ex){
-            JOptionPane.showMessageDialog(null,"Você digitou algo que não é número","Falha",JOptionPane.WARNING_MESSAGE);
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(null, "Você digitou algo que não é número", "Falha", JOptionPane.WARNING_MESSAGE);
         }
     }
 
@@ -213,7 +312,7 @@ public class CrudViewAluno {
 
                 String nascimento = ano + "-" + mes + "-" + dia;
 
-                serviceAluno.setNome(txtNome.getText());
+                serviceAluno.setNome(txtNomeCadastrar.getText());
                 serviceAluno.setNascimento(nascimento);
                 serviceAluno.setIdade(UtilData.calculaIdade(dia, mes, ano));
                 serviceAluno.setSerie(opcSerie.getSelectedIndex() + 6);
@@ -230,6 +329,10 @@ public class CrudViewAluno {
     }
 
     private void verificaData() {
+        verificaDataGeneric(txtDia, txtMes, txtAno, checkBox2);
+    }
+
+    private void verificaDataGeneric(JTextField txtDia, JTextField txtMes, JTextField txtAno, JCheckBox jCheckBox) {
         int dia, mes, ano;
         try {
 
@@ -242,25 +345,36 @@ public class CrudViewAluno {
             var anoValido = UtilData.verificaAnoValido(ano);
 
             if (diaValido && mesValido && anoValido) {
-                checkBox2.setSelected(true);
+                jCheckBox.setSelected(true);
             }
 
         } catch (ExceptionUtilData exceptionUtilData) {
-            checkBox2.setSelected(false);
+            jCheckBox.setSelected(false);
             JOptionPane.showMessageDialog(null, exceptionUtilData.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
         } catch (Exception exception) {
-            checkBox2.setSelected(false);
+            jCheckBox.setSelected(false);
         }
     }
 
+    private void verificaDataAlterar(){
+        verificaDataGeneric(txtDiaAlterar, txtMesAlterar, txtAnoAlterar, checkBox4);
+    }
+
     private void verificaNome() {
-        if (UtilNome.maiorQueSetenta(txtNome.getText().length())) {
-            checkBox1.setSelected(false);
-        } else if (txtNome.getText().length() == 0 || txtNome.getText().isEmpty()) {
-            checkBox1.setSelected(false);
+        verificaNomeGeneric(checkBox1,txtNomeCadastrar);
+    }
+
+    private void verificaNomeGeneric(JCheckBox boxx, JTextField field){
+        if (UtilNome.maiorQueSetenta(field.getText().length())) {
+            boxx.setSelected(false);
+        } else if (field.getText().length() == 0 || field.getText().isEmpty()) {
+            boxx.setSelected(false);
         } else {
-            checkBox1.setSelected(!UtilNome.temCaracterInvalido(txtNome.getText()) && !txtNome.getText().isEmpty());
+            boxx.setSelected(!UtilNome.temCaracterInvalido(field.getText()) && !field.getText().isEmpty());
         }
+    }
+    private void verificaNomeAlterar(){
+        verificaNomeGeneric(checkbox3,textNomeAlterar);
     }
 
     public static void runCrudView(short aba) {

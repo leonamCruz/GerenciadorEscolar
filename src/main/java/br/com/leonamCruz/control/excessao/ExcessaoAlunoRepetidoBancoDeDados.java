@@ -1,4 +1,4 @@
-package br.com.leonamCruz.util.excessao;
+package br.com.leonamCruz.control.excessao;
 
 import java.sql.SQLException;
 

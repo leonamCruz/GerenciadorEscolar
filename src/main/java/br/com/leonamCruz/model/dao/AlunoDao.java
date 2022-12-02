@@ -1,8 +1,8 @@
 package br.com.leonamCruz.model.dao;
 
 import br.com.leonamCruz.control.serviceEntidade.ServiceAluno;
-import br.com.leonamCruz.util.UtilData;
-import br.com.leonamCruz.util.excessao.ExcessaoAlunoRepetidoBancoDeDados;
+import br.com.leonamCruz.control.util.UtilData;
+import br.com.leonamCruz.control.excessao.ExcessaoAlunoRepetidoBancoDeDados;
 
 import java.sql.Date;
 import java.sql.SQLException;
@@ -18,6 +18,7 @@ public class AlunoDao implements GenericDao {
     private static final String EXCLUIR_ALUNO = "delete from tb_alunos where id = ?";
     private static final String ACHA_ID = "select * from tb_alunos where id = ?";
     private static final String PEGA_TODO_MUNDO = "select * from tb_alunos";
+    private static final String UPDATE = "update tb_alunos set nome = ?, nascimento = ?, serie = ? where id = ?";
 
     public AlunoDao(ServiceAluno serviceAluno) {
         this.serviceAluno = serviceAluno;
@@ -48,21 +49,28 @@ public class AlunoDao implements GenericDao {
             if (resultSet.next()) {
                 throw new ExcessaoAlunoRepetidoBancoDeDados("Aluno Repetido...");
             }
-
         }
     }
 
     @Override
     public void alterar() throws SQLException {
+        verificaRepeticao();
 
+        try (var conexao = Conexao.getConexao(); var stmt = conexao.prepareStatement(UPDATE)) {
+            stmt.setString(1, serviceAluno.getNome());
+            stmt.setDate(2, Date.valueOf(serviceAluno.getNascimento()));
+            stmt.setInt(3, serviceAluno.getSerie());
+            stmt.setInt(4,serviceAluno.getId());
+            stmt.execute();
+        }
     }
 
     @Override
-    public void excluir() throws SQLException {
-        verificaSeIdExiste(serviceAluno.getId());
+    public void excluir(int id) throws SQLException {
+        verificaSeIdExiste(id);
 
         try (var conexao = Conexao.getConexao(); var stmt = conexao.prepareStatement(EXCLUIR_ALUNO)) {
-            stmt.setInt(1, serviceAluno.getId());
+            stmt.setInt(1, id);
             stmt.execute();
         }
     }
@@ -136,7 +144,6 @@ public class AlunoDao implements GenericDao {
         try (var conexao = Conexao.getConexao(); var stmt = conexao.prepareStatement(PEGA_TODO_MUNDO)) {
             var resultSet = stmt.executeQuery();
             while (resultSet.next()) {
-                var serviceAluno = new ServiceAluno();
                 var aluno = new ServiceAluno();
                 aluno.setId(resultSet.getInt("id"));
                 aluno.setNome(resultSet.getString("nome"));
