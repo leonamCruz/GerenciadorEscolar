@@ -24,16 +24,19 @@ public class MenuPrincipal {
                 saudacoes.setText(new UtilMenu().saudacoes(new Date()));
             }
         });
-        botaoVamosLa.addActionListener(e -> CrudViewAluno.runCrudView((short) opcAlunos.getSelectedIndex()));
+        botaoVamosLa.addActionListener(e ->{
+
+            CrudViewAluno.runCrudView((short) opcAlunos.getSelectedIndex());
+
+        });
     }
 
     public JPanel getRoot() {
         return root;
     }
-
     public static void main(String[] args) {
         var menuPrincipal = new MenuPrincipal();
-        var frame = new JFrame("Menu Principal");
+        JFrame frame = new JFrame("Menu Principal");
         frame.setContentPane(menuPrincipal.getRoot());
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.pack();
