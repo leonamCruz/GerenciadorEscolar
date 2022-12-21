@@ -1,5 +1,5 @@
 # GerenciadorEscolar
-  Olá, eu me chamo Leonam. Meu gerenciador escolar atualmente está apenas cadastrando alunos nessa versão 1.1.
+  Olá, eu me chamo Leonam. Meu gerenciador escolar atualmente está apenas cadastrando alunos nessa versão 1.5.
 
 # Detalhes Técnicos
   O projeto está na Arquitetura MVC(Model-View-Control); Atualmente estou usando uma tecnologia defasada para a view que é a Swing.
