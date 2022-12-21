@@ -7,9 +7,9 @@ import java.sql.SQLException;
 public class Conexao {
     public static Connection getConexao() {
         try {
-            return DriverManager.getConnection("jdbc:mysql://localhost:3306/bd_alunos", "Cabuloso", "Leonam1!");
+            return DriverManager.getConnection("jdbc:mysql://localhost:3306/bd_alunos", "leonam", "123");
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
         return null;
     }

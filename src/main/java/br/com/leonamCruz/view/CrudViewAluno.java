@@ -1,10 +1,10 @@
 package br.com.leonamCruz.view;
 
+import br.com.leonamCruz.control.excessao.ExceptionUtilData;
 import br.com.leonamCruz.control.serviceDao.ServiceAlunoDao;
 import br.com.leonamCruz.control.serviceEntidade.ServiceAluno;
 import br.com.leonamCruz.control.util.UtilData;
 import br.com.leonamCruz.control.util.UtilNome;
-import br.com.leonamCruz.control.excessao.ExceptionUtilData;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -42,6 +42,8 @@ public class CrudViewAluno {
     private JButton botaoAlterar;
     private JCheckBox checkbox3;
     private JCheckBox checkBox4;
+    private JComboBox opcSeriePesquisa;
+    private JButton botaoPesquisarSerie;
 
     private JPanel getRoot() {
         return root;
@@ -118,7 +120,13 @@ public class CrudViewAluno {
         });
         botaoCadastrar.addActionListener(e -> cadastrar());
         excluirButton.addActionListener(e -> excluir());
-        botaoPesquisaPorId.addActionListener(e -> listarPorId(Integer.parseInt(txtIdPesquisa.getText())));
+        botaoPesquisaPorId.addActionListener(e -> {
+            try {
+                listarPorId(Integer.parseInt(txtIdPesquisa.getText()));
+            }catch(NumberFormatException exception){
+                JOptionPane.showMessageDialog(null,"Vazio ou inválido...", "Erro",JOptionPane.ERROR_MESSAGE);
+            }
+        });
         botaoPesquisaPorNome.addActionListener(e -> listarPorNome(txtPesquisaPorNome.getText()));
         limparPesquisaButton.addActionListener(e -> limparPesquisa());
         mostrarTodosAlunosButton.addActionListener(e -> mostrarTodos());
@@ -172,6 +180,16 @@ public class CrudViewAluno {
             }
         });
         botaoAlterar.addActionListener(e -> alterar());
+        botaoPesquisarSerie.addActionListener(e -> pesquisaPorSerie(opcSeriePesquisa.getSelectedIndex()+6));
+    }
+
+    private void pesquisaPorSerie(int serie) {
+        var serviceAlunoDao = new ServiceAlunoDao();
+        try {
+            listar(serviceAlunoDao.PesquisaPorSerie(serie));
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null,"Não foi possível pesquisar por série, tente novamente","Falha",JOptionPane.WARNING_MESSAGE);
+        }
     }
 
     private void alterar() {
@@ -194,7 +212,7 @@ public class CrudViewAluno {
 
                 new ServiceAlunoDao(serviceAluno).alterar();
 
-                JOptionPane.showMessageDialog(null, "Alterado com Sucesso", "Sucesso", JOptionPane.DEFAULT_OPTION);
+                JOptionPane.showMessageDialog(null, "Alterado com Sucesso", "Sucesso", JOptionPane.PLAIN_MESSAGE);
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(null, "Sem Sucesso:  " + e.getMessage(), "Fail", JOptionPane.ERROR_MESSAGE);
             }
@@ -216,7 +234,6 @@ public class CrudViewAluno {
         txtDiaAlterar.setText(String.valueOf(dia));
         txtMesAlterar.setText(String.valueOf(mes));
         txtAnoAlterar.setText(String.valueOf(ano));
-
         opcSerieAlterar.setSelectedIndex((Integer) tabela.getValueAt(linha,4) - 6);
         verificaNomeAlterar();
         verificaDataAlterar();
@@ -237,7 +254,7 @@ public class CrudViewAluno {
         } else {
             try {
                 new ServiceAlunoDao().excluir(Integer.parseInt(txtIdExcluir.getText()));
-                JOptionPane.showMessageDialog(null, "Excluido com sucesso", "Sucesso", JOptionPane.DEFAULT_OPTION);
+                JOptionPane.showMessageDialog(null, "Excluido com sucesso", "Sucesso", JOptionPane.PLAIN_MESSAGE);
             } catch (SQLException ex) {
                 JOptionPane.showMessageDialog(null, ex.getMessage(), "Fail", JOptionPane.ERROR_MESSAGE);
             } catch (NumberFormatException exception) {
@@ -252,7 +269,7 @@ public class CrudViewAluno {
     }
 
     private void listarPorNome(String nome) {
-        if (txtPesquisaPorNome.getText().isEmpty()) {
+        if (txtPesquisaPorNome.getText().isBlank()) {
             JOptionPane.showMessageDialog(null, "Caixa de texto vazia", "Erro", JOptionPane.WARNING_MESSAGE);
         } else {
             try {
@@ -274,14 +291,14 @@ public class CrudViewAluno {
                     serviceAluno.getIdade(),
                     serviceAluno.getSerie()
             });
-            menuPesquisa.setSelectedIndex(2);
+            menuPesquisa.setSelectedIndex(3);
         }
     }
 
     private void listarPorId(int id) {
         try {
             listar(new ServiceAlunoDao().pesquisarPorId(id));
-            menuPesquisa.setSelectedIndex(2);
+            menuPesquisa.setSelectedIndex(3);
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
         } catch (NumberFormatException ex) {
@@ -319,7 +336,7 @@ public class CrudViewAluno {
 
                 new ServiceAlunoDao(serviceAluno).salvar();
 
-                JOptionPane.showMessageDialog(null, "Cadastrado com Sucesso", "Sucesso", JOptionPane.DEFAULT_OPTION);
+                JOptionPane.showMessageDialog(null, "Cadastrado com Sucesso", "Sucesso", JOptionPane.PLAIN_MESSAGE);
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(null, "Sem Sucesso: + " + e.getMessage(), "Fail", JOptionPane.ERROR_MESSAGE);
             }
@@ -367,9 +384,9 @@ public class CrudViewAluno {
     private void verificaNomeGeneric(JCheckBox boxx, JTextField field){
         if (UtilNome.maiorQueSetenta(field.getText().length())) {
             boxx.setSelected(false);
-        } else if (field.getText().length() == 0 || field.getText().isEmpty()) {
+        } else if (field.getText().isBlank()) {
             boxx.setSelected(false);
-        } else {
+        }else{
             boxx.setSelected(!UtilNome.temCaracterInvalido(field.getText()) && !field.getText().isEmpty());
         }
     }

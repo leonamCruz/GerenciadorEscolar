@@ -30,7 +30,7 @@ public class UtilNome {
         for (int i = 0; i < nomeVerificacao.length(); i++) {
             char chr = nomeVerificacao.charAt(i);
             for (char c : osQNaoPode) {
-                if (c == chr) {
+                if (c == chr || Character.isDigit(chr)) {
                     return true;
                 }
             }

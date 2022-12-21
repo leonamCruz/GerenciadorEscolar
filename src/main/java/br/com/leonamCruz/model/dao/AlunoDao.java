@@ -1,15 +1,15 @@
 package br.com.leonamCruz.model.dao;
 
+import br.com.leonamCruz.control.excessao.ExcessaoAlunoRepetidoBancoDeDados;
 import br.com.leonamCruz.control.serviceEntidade.ServiceAluno;
 import br.com.leonamCruz.control.util.UtilData;
-import br.com.leonamCruz.control.excessao.ExcessaoAlunoRepetidoBancoDeDados;
 
 import java.sql.Date;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-@SuppressWarnings("ALL")
 public class AlunoDao implements GenericDao {
     ServiceAluno serviceAluno;
     private static final String PESQUISA_POR_NOME = "select * from tb_alunos where nome like ?";
@@ -18,6 +18,7 @@ public class AlunoDao implements GenericDao {
     private static final String EXCLUIR_ALUNO = "delete from tb_alunos where id = ?";
     private static final String ACHA_ID = "select * from tb_alunos where id = ?";
     private static final String PEGA_TODO_MUNDO = "select * from tb_alunos";
+    private static final String PESQUISA_POR_SERIE = "select * from tb_alunos where serie = ?";
     private static final String UPDATE = "update tb_alunos set nome = ?, nascimento = ?, serie = ? where id = ?";
 
     public AlunoDao(ServiceAluno serviceAluno) {
@@ -25,6 +26,15 @@ public class AlunoDao implements GenericDao {
     }
 
     public AlunoDao() {
+    }
+
+    public List<ServiceAluno> PesquisaPorSerie(int serie) throws SQLException {
+        var lista = new ArrayList<ServiceAluno>();
+        try (var con = Conexao.getConexao(); var stmt = con.prepareStatement(PESQUISA_POR_SERIE)) {
+            stmt.setInt(1,serie);
+            queryResultSet(lista, stmt);
+        }
+        return lista;
     }
 
     @Override
@@ -60,7 +70,7 @@ public class AlunoDao implements GenericDao {
             stmt.setString(1, serviceAluno.getNome());
             stmt.setDate(2, Date.valueOf(serviceAluno.getNascimento()));
             stmt.setInt(3, serviceAluno.getSerie());
-            stmt.setInt(4,serviceAluno.getId());
+            stmt.setInt(4, serviceAluno.getId());
             stmt.execute();
         }
     }
@@ -91,23 +101,7 @@ public class AlunoDao implements GenericDao {
 
         try (var conexao = Conexao.getConexao(); var stmt = conexao.prepareStatement(ACHA_ID)) {
             stmt.setInt(1, id);
-            var resultSet = stmt.executeQuery();
-            if (resultSet.next()) {
-                var alunoService = new ServiceAluno();
-                alunoService.setId(resultSet.getInt("id"));
-                alunoService.setNome(resultSet.getString("nome"));
-
-                var dataBr = UtilData.padraoBrasileiroDeData(resultSet.getString("nascimento"));
-                int dia = UtilData.pegaDia(dataBr);
-                int mes = UtilData.pegaMes(dataBr);
-                int ano = UtilData.pegaAno(dataBr);
-                int idade = UtilData.calculaIdade(dia, mes, ano);
-
-                alunoService.setNascimento(dataBr);
-                alunoService.setIdade(idade);
-                alunoService.setSerie(resultSet.getInt("serie"));
-                lista.add(alunoService);
-            }
+            queryResultSet(lista,stmt);
             return lista;
         }
     }
@@ -117,23 +111,7 @@ public class AlunoDao implements GenericDao {
 
         try (var conexao = Conexao.getConexao(); var stmt = conexao.prepareStatement(PESQUISA_POR_NOME)) {
             stmt.setString(1, nome);
-            var resultSet = stmt.executeQuery();
-            while (resultSet.next()) {
-                var aluno = new ServiceAluno();
-                aluno.setId(resultSet.getInt("id"));
-                aluno.setNome(resultSet.getString("nome"));
-
-                var dataBr = UtilData.padraoBrasileiroDeData(resultSet.getString("nascimento"));
-                int dia = UtilData.pegaDia(dataBr);
-                int mes = UtilData.pegaMes(dataBr);
-                int ano = UtilData.pegaAno(dataBr);
-                int idade = UtilData.calculaIdade(dia, mes, ano);
-
-                aluno.setNascimento(dataBr);
-                aluno.setIdade(idade);
-                aluno.setSerie(resultSet.getInt("serie"));
-                lista.add(aluno);
-            }
+            queryResultSet(lista, stmt);
             return lista;
         }
     }
@@ -142,24 +120,28 @@ public class AlunoDao implements GenericDao {
         List<ServiceAluno> lista = new ArrayList<>();
 
         try (var conexao = Conexao.getConexao(); var stmt = conexao.prepareStatement(PEGA_TODO_MUNDO)) {
-            var resultSet = stmt.executeQuery();
-            while (resultSet.next()) {
-                var aluno = new ServiceAluno();
-                aluno.setId(resultSet.getInt("id"));
-                aluno.setNome(resultSet.getString("nome"));
-
-                var dataBr = UtilData.padraoBrasileiroDeData(resultSet.getString("nascimento"));
-                int dia = UtilData.pegaDia(dataBr);
-                int mes = UtilData.pegaMes(dataBr);
-                int ano = UtilData.pegaAno(dataBr);
-                int idade = UtilData.calculaIdade(dia, mes, ano);
-
-                aluno.setNascimento(dataBr);
-                aluno.setIdade(idade);
-                aluno.setSerie(resultSet.getInt("serie"));
-                lista.add(aluno);
-            }
+            queryResultSet(lista, stmt);
         }
         return lista;
+    }
+
+    private void queryResultSet(List<ServiceAluno> lista, PreparedStatement stmt) throws SQLException {
+        var resultSet = stmt.executeQuery();
+        while (resultSet.next()) {
+            var aluno = new ServiceAluno();
+            aluno.setId(resultSet.getInt("id"));
+            aluno.setNome(resultSet.getString("nome"));
+
+            var dataBr = UtilData.padraoBrasileiroDeData(resultSet.getString("nascimento"));
+            int dia = UtilData.pegaDia(dataBr);
+            int mes = UtilData.pegaMes(dataBr);
+            int ano = UtilData.pegaAno(dataBr);
+            int idade = UtilData.calculaIdade(dia, mes, ano);
+
+            aluno.setNascimento(dataBr);
+            aluno.setIdade(idade);
+            aluno.setSerie(resultSet.getInt("serie"));
+            lista.add(aluno);
+        }
     }
 }

@@ -4,6 +4,4 @@ import br.com.leonamCruz.model.entidade.Aluno;
 
 public class ServiceAluno extends Aluno{
 
-
-
 }
