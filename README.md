@@ -7,9 +7,6 @@
   
   Projeto se encontra em Maven para gerenciar as dependências, não precisa se preocupar em baixar livrarias externas.
   
-  O que está fazendo a conexão com o banco de dados é o JDBC, então meu projeto pode sofrer de SQL Injection. (Divirta - se
-  hackeando rsrs).
-  
   A pasta UTIL tem algumas ferramentas que eu desenvolvi para me ajudar a trabalhar com tempo, e nomes no Java. Logo mais estarei
   desenvolvendo mais algumas.
   
